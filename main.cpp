@@ -1,12 +1,11 @@
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <queue>
 using namespace std;
 
-
 struct Node {
     int data;
+    int depth; 
     Node* left;
     Node* right;
 
@@ -14,17 +13,15 @@ struct Node {
         data = value;
         left = nullptr;
         right = nullptr;
+        depth = 0;
     }
 };
 
-
 Node* insert(Node* root, int value) {
-   
     if (root == nullptr) {
         return new Node(value);
     }
 
-    
     if (value < root->data) {
         root->left = insert(root->left, value);
     } else {
@@ -34,14 +31,12 @@ Node* insert(Node* root, int value) {
     return root;
 }
 
-
 Node* findMin(Node* root) {
     while (root->left != nullptr) {
         root = root->left;
     }
     return root;
 }
-
 
 Node* remove(Node* root, int value) {
     if (root == nullptr) {
@@ -53,7 +48,6 @@ Node* remove(Node* root, int value) {
     } else if (value > root->data) {
         root->right = remove(root->right, value);
     } else {
-        
         if (root->left == nullptr) {
             Node* temp = root->right;
             delete root;
@@ -64,7 +58,6 @@ Node* remove(Node* root, int value) {
             return temp;
         }
 
-        
         Node* temp = findMin(root->right);
         root->data = temp->data;
         root->right = remove(root->right, temp->data);
@@ -98,13 +91,20 @@ void printLevelOrder(Node* root) {
         while (nodesAtCurrentLevel > 0) {
             Node* current = q.front();
             q.pop();
-            cout << current->data << " ";
+
+            for (int i = 0; i < current->depth; ++i) {
+                cout << "-> ";
+            }
+
+            cout << current->data << "\t";
 
             if (current->left != nullptr) {
+                current->left->depth = current->depth + 1;
                 q.push(current->left);
             }
 
             if (current->right != nullptr) {
+                current->right->depth = current->depth + 1;
                 q.push(current->right);
             }
 
@@ -114,7 +114,6 @@ void printLevelOrder(Node* root) {
         cout << endl;
     }
 }
-
 
 void deleteTree(Node* root) {
     if (root == nullptr) return;
@@ -134,6 +133,10 @@ int main() {
     getline(cin, input);
     istringstream iss(input);
     while (iss >> value) {
+        if (value < 1 || value > 999) {
+            cout << "Please enter numbers between 1 and 999 only." << endl;
+            continue;
+        }
         root = insert(root, value);
     }
 
@@ -143,6 +146,7 @@ int main() {
     while (true) {
         cout << "\nDo you want to perform any operation? (Y/N): ";
         cin >> choice;
+        cin.ignore(); 
 
         if (choice == 'N' || choice == 'n') {
             break;
@@ -158,12 +162,20 @@ int main() {
         int operation;
         cout << "Enter operation number: ";
         cin >> operation;
+        cin.ignore(); 
 
         switch (operation) {
             case 1:
-                cout << "Enter the number to insert: ";
-                cin >> value;
-                root = insert(root, value);
+                cout << "Enter the numbers to insert (separated by space): ";
+                getline(cin, input);
+                istringstream insert_iss(input);
+                while (insert_iss >> value) {
+                    if (value < 1 || value > 999) {
+                        cout << "Please enter numbers between 1 and 999 only." << endl;
+                        continue;
+                    }
+                    root = insert(root, value);
+                }
                 break;
             case 2:
                 cout << "Enter the number to remove: ";
