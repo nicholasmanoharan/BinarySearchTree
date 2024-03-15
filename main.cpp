@@ -1,6 +1,9 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <queue>
 using namespace std;
+
 
 struct Node {
     int data;
@@ -16,11 +19,12 @@ struct Node {
 
 
 Node* insert(Node* root, int value) {
-    
+   
     if (root == nullptr) {
         return new Node(value);
     }
 
+    
     if (value < root->data) {
         root->left = insert(root->left, value);
     } else {
@@ -60,14 +64,13 @@ Node* remove(Node* root, int value) {
             return temp;
         }
 
-       
+        
         Node* temp = findMin(root->right);
-        root->data = temp->data;    
+        root->data = temp->data;
         root->right = remove(root->right, temp->data);
     }
     return root;
 }
-
 
 bool search(Node* root, int value) {
     if (root == nullptr) {
@@ -82,7 +85,6 @@ bool search(Node* root, int value) {
         return search(root->right, value);
     }
 }
-
 
 void printLevelOrder(Node* root) {
     if (root == nullptr) return;
@@ -113,44 +115,83 @@ void printLevelOrder(Node* root) {
     }
 }
 
+
+void deleteTree(Node* root) {
+    if (root == nullptr) return;
+
+    deleteTree(root->left);
+    deleteTree(root->right);
+    delete root;
+}
+
 int main() {
     Node* root = nullptr;
     int value;
+    char choice;
 
-   
-    cout << "Enter values to insert into the binary search tree (between 1 and 999, enter -1 to stop):" << endl;
-    while (true) {
-        cout << "Enter value: ";
-        cin >> value;
-        if (value == -1) {
-            break;
-        }
+    cout << "Enter numbers to insert into the binary search tree (between 1 and 999, separated by a space):" << endl;
+    string input;
+    getline(cin, input);
+    istringstream iss(input);
+    while (iss >> value) {
         root = insert(root, value);
     }
 
-    
     cout << "Binary Search Tree:" << endl;
     printLevelOrder(root);
-    cout << endl;
 
-    
-    int searchValue;
-    cout << "Enter a value to search in the tree: ";
-    cin >> searchValue;
-    if (search(root, searchValue)) {
-        cout << searchValue << " is in the tree." << endl;
-    } else {
-        cout << searchValue << " is not in the tree." << endl;
+    while (true) {
+        cout << "\nDo you want to perform any operation? (Y/N): ";
+        cin >> choice;
+
+        if (choice == 'N' || choice == 'n') {
+            break;
+        }
+
+        cout << "Choose operation: \n";
+        cout << "1. Insert a number\n";
+        cout << "2. Remove a number\n";
+        cout << "3. Search for a number\n";
+        cout << "4. Print the tree\n";
+        cout << "5. Exit\n";
+
+        int operation;
+        cout << "Enter operation number: ";
+        cin >> operation;
+
+        switch (operation) {
+            case 1:
+                cout << "Enter the number to insert: ";
+                cin >> value;
+                root = insert(root, value);
+                break;
+            case 2:
+                cout << "Enter the number to remove: ";
+                cin >> value;
+                root = remove(root, value);
+                break;
+            case 3:
+                cout << "Enter the number to search for: ";
+                cin >> value;
+                if (search(root, value)) {
+                    cout << value << " is in the tree." << endl;
+                } else {
+                    cout << value << " is not in the tree." << endl;
+                }
+                break;
+            case 4:
+                cout << "Binary Search Tree:" << endl;
+                printLevelOrder(root);
+                break;
+            case 5:
+                cout << "Exiting...\n";
+                deleteTree(root);
+                return 0;
+            default:
+                cout << "Invalid operation!\n";
+        }
     }
 
-  
-    int removeValue;
-    cout << "Enter a value to remove from the tree: ";
-    cin >> removeValue;
-    root = remove(root, removeValue);
-    cout << "After removing " << removeValue << ":" << endl;
-    printLevelOrder(root);
-    cout << endl;
-
+    deleteTree(root);
     return 0;
 }
