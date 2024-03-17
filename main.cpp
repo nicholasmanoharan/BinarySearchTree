@@ -127,23 +127,29 @@ int main() {
     Node* root = nullptr;
     int value;
     char choice;
-
-    cout << "Enter numbers to insert into the binary search tree (between 1 and 999, separated by a space):" << endl;
     string input;
-    getline(cin, input);
-    istringstream iss(input);
-    while (iss >> value) {
-        if (value < 1 || value > 999) {
-            cout << "Please enter numbers between 1 and 999 only." << endl;
-            continue;
-        }
-        root = insert(root, value);
-    }
-
-    cout << "Binary Search Tree:" << endl;
-    printLevelOrder(root);
 
     while (true) {
+        cout << "Enter numbers to insert into the binary search tree (between 1 and 999, separated by a space):" << endl;
+        getline(cin, input);
+        istringstream iss(input);
+        
+        // Clear existing tree
+        deleteTree(root);
+        root = nullptr;
+
+        // Insert new numbers
+        while (iss >> value) {
+            if (value < 1 || value > 999) {
+                cout << "Please enter numbers between 1 and 999 only." << endl;
+                continue;
+            }
+            root = insert(root, value);
+        }
+
+        cout << "Binary Search Tree:" << endl;
+        printLevelOrder(root);
+
         cout << "\nDo you want to perform any operation? (Y/N): ";
         cin >> choice;
         cin.ignore(); 
@@ -155,9 +161,8 @@ int main() {
         cout << "Choose operation: \n";
         cout << "1. Insert a number\n";
         cout << "2. Remove a number\n";
-        cout << "3. Search for a number\n";
-        cout << "4. Print the tree\n";
-        cout << "5. Exit\n";
+        cout << "3. Print the tree\n";
+        cout << "4. Exit\n";
 
         int operation;
         cout << "Enter operation number: ";
@@ -166,16 +171,13 @@ int main() {
 
         switch (operation) {
             case 1:
-                cout << "Enter the numbers to insert (separated by space): ";
-                getline(cin, input);
-                istringstream insert_iss(input);
-                while (insert_iss >> value) {
-                    if (value < 1 || value > 999) {
-                        cout << "Please enter numbers between 1 and 999 only." << endl;
-                        continue;
-                    }
-                    root = insert(root, value);
+                cout << "Enter the number to insert: ";
+                cin >> value;
+                if (value < 1 || value > 999) {
+                    cout << "Please enter a number between 1 and 999 only." << endl;
+                    break;
                 }
+                root = insert(root, value);
                 break;
             case 2:
                 cout << "Enter the number to remove: ";
@@ -183,19 +185,10 @@ int main() {
                 root = remove(root, value);
                 break;
             case 3:
-                cout << "Enter the number to search for: ";
-                cin >> value;
-                if (search(root, value)) {
-                    cout << value << " is in the tree." << endl;
-                } else {
-                    cout << value << " is not in the tree." << endl;
-                }
-                break;
-            case 4:
                 cout << "Binary Search Tree:" << endl;
                 printLevelOrder(root);
                 break;
-            case 5:
+            case 4:
                 cout << "Exiting...\n";
                 deleteTree(root);
                 return 0;
