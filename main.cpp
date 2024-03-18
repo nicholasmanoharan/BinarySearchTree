@@ -1,11 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <queue>
 using namespace std;
 
+
 struct Node {
     int data;
-    int depth; 
     Node* left;
     Node* right;
 
@@ -13,15 +14,17 @@ struct Node {
         data = value;
         left = nullptr;
         right = nullptr;
-        depth = 0;
     }
 };
 
+
 Node* insert(Node* root, int value) {
+   
     if (root == nullptr) {
         return new Node(value);
     }
 
+    
     if (value < root->data) {
         root->left = insert(root->left, value);
     } else {
@@ -31,12 +34,14 @@ Node* insert(Node* root, int value) {
     return root;
 }
 
+
 Node* findMin(Node* root) {
     while (root->left != nullptr) {
         root = root->left;
     }
     return root;
 }
+
 
 Node* remove(Node* root, int value) {
     if (root == nullptr) {
@@ -48,6 +53,7 @@ Node* remove(Node* root, int value) {
     } else if (value > root->data) {
         root->right = remove(root->right, value);
     } else {
+        
         if (root->left == nullptr) {
             Node* temp = root->right;
             delete root;
@@ -58,6 +64,7 @@ Node* remove(Node* root, int value) {
             return temp;
         }
 
+        
         Node* temp = findMin(root->right);
         root->data = temp->data;
         root->right = remove(root->right, temp->data);
@@ -82,30 +89,24 @@ bool search(Node* root, int value) {
 void printLevelOrder(Node* root) {
     if (root == nullptr) return;
 
-    queue<Node*> q;
-    q.push(root);
+    queue<pair<Node*, string > > q;
+    q.push(pair<Node*, string>(root, ""));
 
     while (!q.empty()) {
         int nodesAtCurrentLevel = q.size();
 
         while (nodesAtCurrentLevel > 0) {
-            Node* current = q.front();
+            Node* current = q.front().first;
+            string arrow = q.front().second;
             q.pop();
-
-            for (int i = 0; i < current->depth; ++i) {
-                cout << "-> ";
-            }
-
-            cout << current->data << "\t";
+            cout << current->data << " " << arrow;
 
             if (current->left != nullptr) {
-                current->left->depth = current->depth + 1;
-                q.push(current->left);
+                q.push(pair<Node*, string>(current->left, arrow + "<-"));
             }
 
             if (current->right != nullptr) {
-                current->right->depth = current->depth + 1;
-                q.push(current->right);
+                q.push(pair<Node*, string>(current->right, arrow + "->"));
             }
 
             nodesAtCurrentLevel--;
@@ -114,6 +115,8 @@ void printLevelOrder(Node* root) {
         cout << endl;
     }
 }
+
+
 
 void deleteTree(Node* root) {
     if (root == nullptr) return;
@@ -127,32 +130,21 @@ int main() {
     Node* root = nullptr;
     int value;
     char choice;
+
+    cout << "Enter numbers to insert into the binary search tree (between 1 and 999, separated by a space):" << endl;
     string input;
+    getline(cin, input);
+    istringstream iss(input);
+    while (iss >> value) {
+        root = insert(root, value);
+    }
+
+    cout << "Binary Search Tree:" << endl;
+    printLevelOrder(root);
 
     while (true) {
-        cout << "Enter numbers to insert into the binary search tree (between 1 and 999, separated by a space):" << endl;
-        getline(cin, input);
-        istringstream iss(input);
-        
-        // Clear existing tree
-        deleteTree(root);
-        root = nullptr;
-
-        // Insert new numbers
-        while (iss >> value) {
-            if (value < 1 || value > 999) {
-                cout << "Please enter numbers between 1 and 999 only." << endl;
-                continue;
-            }
-            root = insert(root, value);
-        }
-
-        cout << "Binary Search Tree:" << endl;
-        printLevelOrder(root);
-
         cout << "\nDo you want to perform any operation? (Y/N): ";
         cin >> choice;
-        cin.ignore(); 
 
         if (choice == 'N' || choice == 'n') {
             break;
@@ -161,22 +153,18 @@ int main() {
         cout << "Choose operation: \n";
         cout << "1. Insert a number\n";
         cout << "2. Remove a number\n";
-        cout << "3. Print the tree\n";
-        cout << "4. Exit\n";
+        cout << "3. Search for a number\n";
+        cout << "4. Print the tree\n";
+        cout << "5. Exit\n";
 
         int operation;
         cout << "Enter operation number: ";
         cin >> operation;
-        cin.ignore(); 
 
         switch (operation) {
             case 1:
                 cout << "Enter the number to insert: ";
                 cin >> value;
-                if (value < 1 || value > 999) {
-                    cout << "Please enter a number between 1 and 999 only." << endl;
-                    break;
-                }
                 root = insert(root, value);
                 break;
             case 2:
@@ -185,10 +173,19 @@ int main() {
                 root = remove(root, value);
                 break;
             case 3:
+                cout << "Enter the number to search for: ";
+                cin >> value;
+                if (search(root, value)) {
+                    cout << value << " is in the tree." << endl;
+                } else {
+                    cout << value << " is not in the tree." << endl;
+                }
+                break;
+            case 4:
                 cout << "Binary Search Tree:" << endl;
                 printLevelOrder(root);
                 break;
-            case 4:
+            case 5:
                 cout << "Exiting...\n";
                 deleteTree(root);
                 return 0;
