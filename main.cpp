@@ -1,15 +1,16 @@
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <queue>
 using namespace std;
 
-
 struct Node {
     int data;
     Node* left;
     Node* right;
 
+    // Initialize a node for a given value
     Node(int value) {
         data = value;
         left = nullptr;
@@ -17,14 +18,12 @@ struct Node {
     }
 };
 
-
+// Inserting a value into the tree
 Node* insert(Node* root, int value) {
-   
     if (root == nullptr) {
         return new Node(value);
     }
 
-    
     if (value < root->data) {
         root->left = insert(root->left, value);
     } else {
@@ -35,6 +34,7 @@ Node* insert(Node* root, int value) {
 }
 
 
+//Finding the min value in the tree
 Node* findMin(Node* root) {
     while (root->left != nullptr) {
         root = root->left;
@@ -43,6 +43,7 @@ Node* findMin(Node* root) {
 }
 
 
+//Function to remove a number
 Node* remove(Node* root, int value) {
     if (root == nullptr) {
         return root;
@@ -53,7 +54,6 @@ Node* remove(Node* root, int value) {
     } else if (value > root->data) {
         root->right = remove(root->right, value);
     } else {
-        
         if (root->left == nullptr) {
             Node* temp = root->right;
             delete root;
@@ -64,7 +64,6 @@ Node* remove(Node* root, int value) {
             return temp;
         }
 
-        
         Node* temp = findMin(root->right);
         root->data = temp->data;
         root->right = remove(root->right, temp->data);
@@ -72,6 +71,8 @@ Node* remove(Node* root, int value) {
     return root;
 }
 
+
+//Searching for an element in the tree
 bool search(Node* root, int value) {
     if (root == nullptr) {
         return false;
@@ -86,6 +87,8 @@ bool search(Node* root, int value) {
     }
 }
 
+
+//Printing the tree in level order 
 void printLevelOrder(Node* root) {
     if (root == nullptr) return;
 
@@ -99,7 +102,7 @@ void printLevelOrder(Node* root) {
             Node* current = q.front().first;
             string arrow = q.front().second;
             q.pop();
-            cout << current->data << " " << arrow;
+            cout << arrow << current->data << " ";
 
             if (current->left != nullptr) {
                 q.push(pair<Node*, string>(current->left, arrow + "<-"));
@@ -117,7 +120,7 @@ void printLevelOrder(Node* root) {
 }
 
 
-
+//Function used to delete a number from the tree
 void deleteTree(Node* root) {
     if (root == nullptr) return;
 
